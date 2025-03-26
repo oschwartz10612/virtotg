@@ -66,8 +66,7 @@ def main():
         else:
             logging.info("Performing incremental backup routine")
             # cant perform incremental backup if there are not snap files in the backing
-            if not snap_files:
-                logging.warning("Cannot perform incremental backup snapshot without existing snapshot files")
+            if snap_files:
                 virtotg.create_snapshot(disk_paths, "tmp") # snap disks
 
                 # Backup the active disks
