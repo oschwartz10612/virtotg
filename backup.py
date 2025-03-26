@@ -66,24 +66,13 @@ def main():
         else:
             # cant perform incremental backup if there are not snap files in the backing
             if not snap_files:
-                logging.error("Cannot perform incremental backup without existing snapshot files")
-                sys.exit(1)
+                logging.error("Cannot perform incremental backup snapshot without existing snapshot files")
+                virtotg.create_snapshot(disk_paths, "tmp") # snap disks
 
             logging.info("Performing incremental backup routine")
 
-            tmp_disk_paths = virtotg.get_disk_paths()
-            do_snap = True
-            for disk_path in tmp_disk_paths:
-                if disk_path.endswith(".tmp"): # do not do another snapshot if there is already a tmp file
-                    do_snap = False
-                    break
-            if do_snap:
-                # Create new snapshot
-                virtotg.create_snapshot(disk_paths, "tmp") # snap disks 
-
-            backup_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-
             # Backup the active disks
+            backup_time = datetime.now().strftime('%Y%m%d_%H%M%S')
             virtotg.backup_disks(disk_paths, intermediate_dir=backup_time)
 
             # Perform blockcommit
