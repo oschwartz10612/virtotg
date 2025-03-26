@@ -71,8 +71,15 @@ def main():
 
             logging.info("Performing incremental backup routine")
 
-            # Create new snapshot
-            virtotg.create_snapshot(disk_paths, "tmp") # snap disks
+            tmp_disk_paths = virtotg.get_disk_paths()
+            do_snap = True
+            for disk_path in tmp_disk_paths:
+                if disk_path.endswith(".tmp"): # do not do another snapshot if there is already a tmp file
+                    do_snap = False
+                    break
+            if do_snap:
+                # Create new snapshot
+                virtotg.create_snapshot(disk_paths, "tmp") # snap disks 
 
             backup_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 
