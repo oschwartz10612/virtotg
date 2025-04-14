@@ -26,6 +26,7 @@ parser = argparse.ArgumentParser(description='Backup VM disks to external drive'
 parser.add_argument('--domain', type=str, help='Name of the domain to backup', required=True)
 parser.add_argument('--drive', type=str, help='Path to the external drive', required=True)
 parser.add_argument('--full', action='store_true', help='Perform a full backup')
+parser.add_argument('--exclude', type=str, help='Exclude specific disks from backup', nargs='+', default=[])
 args = parser.parse_args()
 
 virtotg = VirtOTG(args.domain, args.drive)
@@ -40,7 +41,7 @@ def main():
             sys.exit(1)
 
         # Get disk paths
-        disk_paths = virtotg.get_disk_paths()
+        disk_paths = virtotg.get_disk_paths(args.exclude)
         snap_files = [disk_path for disk_path in disk_paths if disk_path.endswith(".snap")]
         
         if args.full:
@@ -53,7 +54,7 @@ def main():
             virtotg.cleanup_disks(disks_to_rm)
 
             # Create new snapshot
-            backing_disk_paths = virtotg.get_disk_paths()
+            backing_disk_paths = virtotg.get_disk_paths(args.exclude)
             virtotg.create_snapshot(backing_disk_paths, "snap")
         
             # cleanup the disks on the external drive
@@ -74,7 +75,7 @@ def main():
                 virtotg.backup_disks(disk_paths, intermediate_dir=backup_time)
 
             # Perform blockcommit
-            tmp_disk_paths = virtotg.get_disk_paths()
+            tmp_disk_paths = virtotg.get_disk_paths(args.exclude)
             disks_to_rm = virtotg.perform_blockcommit(tmp_disk_paths, shallow=True)
 
             # Cleanup temporary disk snapshots

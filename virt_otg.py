@@ -38,7 +38,7 @@ class VirtOTG:
             logging.error(f"Failed to get domain XML: {e}")
             sys.exit(1)
 
-    def get_disk_paths(self):
+    def get_disk_paths(self, excluded=None):
         """Parse domain XML to get disk paths."""
         try:
             xml = self.get_domain_xml()
@@ -52,7 +52,11 @@ class VirtOTG:
                         path = source.get('file')
                         if path:
                             disk_paths.append(path)
-            
+
+            # Filter out excluded paths
+            if excluded:
+                disk_paths = [path for path in disk_paths if excluded not in path]
+
             return disk_paths
         except Exception as e:
             logging.error(f"Failed to parse disk paths: {e}")
