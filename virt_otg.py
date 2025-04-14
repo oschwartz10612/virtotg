@@ -53,9 +53,9 @@ class VirtOTG:
                         if path:
                             disk_paths.append(path)
 
-            # Filter out excluded paths
+            # Filter out excluded paths which is an array
             if excluded:
-                disk_paths = [path for path in disk_paths if excluded not in path]
+                disk_paths = [disk_path for disk_path in disk_paths if not any(ex in disk_path for ex in excluded)]
 
             return disk_paths
         except Exception as e:
